@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 
 	try
 	{
-		ros_serial.setPort("/dev/ttyTHS2");
+		ros_serial.setPort("/dev/ttyTHS0");
 		ros_serial.setBaudrate(115200);
 		serial::Timeout serial_timeout = serial::Timeout::simpleTimeout(1000);
 		ros_serial.setTimeout(serial_timeout);

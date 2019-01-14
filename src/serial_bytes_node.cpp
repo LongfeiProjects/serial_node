@@ -4,16 +4,36 @@
 #include <std_msgs/UInt8MultiArray.h>
 #include <std_msgs/MultiArrayLayout.h>
 #include <std_msgs/MultiArrayDimension.h>
+#include <ros/console.h>
+#include <math.h>
 
+const int MSG_LEN = 32;
+const int BUFF_SIZE = 256;
 serial::Serial ros_serial;
 
 void serialCallback(const std_msgs::UInt8MultiArray msg)
 {
 	int tx_data_size = msg.layout.dim[0].size;
-	uint8_t temp_data[tx_data_size];
-	copy(msg.data.begin(), msg.data.end(), temp_data);
-	ros_serial.write(temp_data, tx_data_size);
-	ROS_INFO_STREAM("Write " << tx_data_size << " bytes to serial port");
+	if(tx_data_size >= BUFF_SIZE)
+	{
+		ROS_ERROR("Serial port receive data larger than the buffer size: %d. Skipped.", BUFF_SIZE);
+		return;
+	}
+
+	int num_frame = ceil((double)tx_data_size/MSG_LEN);
+	// uint8_t data_to_send[num_frame][MSG_LEN] = {0};
+	uint8_t data_to_send[MSG_LEN] = {0};
+	for (int i=0; i<num_frame; i++)
+	{
+		for (int j=0; j<MSG_LEN; j++)
+		{
+			data_to_send[j] = msg.data[i*MSG_LEN+j];
+		}
+
+		ros_serial.write(data_to_send, tx_data_size);
+		ROS_INFO_STREAM("Write " << i << "th message to serial port");
+	}
+
 }
 
 int main(int argc, char **argv)

@@ -23,16 +23,21 @@ void serialCallback(const std_msgs::UInt8MultiArray msg)
 	int num_frame = ceil((double)tx_data_size/MSG_LEN);
 	// uint8_t data_to_send[num_frame][MSG_LEN] = {0};
 	uint8_t data_to_send[MSG_LEN] = {0};
+	ros_serial.flush();
 	for (int i=0; i<num_frame; i++)
 	{
 		for (int j=0; j<MSG_LEN; j++)
 		{
 			data_to_send[j] = msg.data[i*MSG_LEN+j];
+			char ppp = data_to_send[j];
 		}
+		printf("data string to send is:%s", data_to_send);
+		printf("\n");
 
 		ros_serial.write(data_to_send, tx_data_size);
 		ROS_INFO_STREAM("Write " << i << "th message to serial port");
 	}
+	ros_serial.flush();
 
 }
 
@@ -60,7 +65,7 @@ int main(int argc, char **argv)
 
 	if (ros_serial.isOpen())
 	{
-		ROS_INFO_STREAM("Serial port opened");
+		// ROS_INFO_STREAM("Serial port opened");
 	}
 	else
 	{

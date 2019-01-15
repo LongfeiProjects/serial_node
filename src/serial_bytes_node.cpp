@@ -25,7 +25,7 @@ void serialCallback(const std_msgs::UInt8MultiArray msg)
 	{
 		temp_msg_data[i] = msg.data[i];
 	}
-	ROS_INFO_STREAM("Received raw msg.data is:"<< temp_msg_data);
+	ROS_DEBUG_STREAM("Received raw msg.data is:"<< temp_msg_data);
 
 	int num_frame = ceil((double)tx_data_size/MSG_LEN);
 	// uint8_t data_to_send[num_frame][MSG_LEN] = {0};
@@ -41,11 +41,8 @@ void serialCallback(const std_msgs::UInt8MultiArray msg)
 			}
 		}
 
-		ros_serial.flush();
 		ros_serial.write(data_to_send, MSG_LEN);
-		ros_serial.flush();
-		ROS_INFO_STREAM("Write " << i << "th message to serial port:"<< data_to_send);
-		sleep(1.0);
+		ROS_DEBUG_STREAM("Write " << i << "th message to serial port:"<< data_to_send);
 	}
 
 }
@@ -74,7 +71,7 @@ int main(int argc, char **argv)
 
 	if (ros_serial.isOpen())
 	{
-		// ROS_INFO_STREAM("Serial port opened");
+		ROS_INFO_STREAM("Serial port opened");
 	}
 	else
 	{

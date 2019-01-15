@@ -7,7 +7,7 @@
 #include <ros/console.h>
 #include <math.h>
 
-const int MSG_LEN = 8;
+const int MSG_LEN = 32;
 const int BUFF_SIZE = 256;
 serial::Serial ros_serial;
 

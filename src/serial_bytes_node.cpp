@@ -7,7 +7,7 @@
 #include <ros/console.h>
 #include <math.h>
 
-const int MSG_LEN = 32;
+const int MSG_LEN = 8;
 const int BUFF_SIZE = 256;
 serial::Serial ros_serial;
 
@@ -20,19 +20,32 @@ void serialCallback(const std_msgs::UInt8MultiArray msg)
 		return;
 	}
 
+	uint8_t temp_msg_data[tx_data_size];
+	for(int i=0; i<tx_data_size; i++)
+	{
+		temp_msg_data[i] = msg.data[i];
+	}
+	ROS_INFO_STREAM("Received raw msg.data is:"<< temp_msg_data);
+
 	int num_frame = ceil((double)tx_data_size/MSG_LEN);
 	// uint8_t data_to_send[num_frame][MSG_LEN] = {0};
-	uint8_t data_to_send[MSG_LEN] = {0};
 	for (int i=0; i<num_frame; i++)
 	{
+		uint8_t data_to_send[MSG_LEN] = {0};
+
 		for (int j=0; j<MSG_LEN; j++)
 		{
-			data_to_send[j] = msg.data[i*MSG_LEN+j];
-			char ppp = data_to_send[j];
+			if(i*MSG_LEN+j<tx_data_size)
+			{
+				data_to_send[j] = msg.data[i*MSG_LEN+j];
+			}
 		}
 
-		ros_serial.write(data_to_send, tx_data_size);
+		ros_serial.flush();
+		ros_serial.write(data_to_send, MSG_LEN);
+		ros_serial.flush();
 		ROS_INFO_STREAM("Write " << i << "th message to serial port:"<< data_to_send);
+		sleep(1.0);
 	}
 
 }
